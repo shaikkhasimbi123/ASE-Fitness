@@ -1,0 +1,42 @@
+:root {
+  --bg-base: #0f0f11;
+  --card-base: rgba(26, 26, 31, 0.65);
+  --card-glass: rgba(30, 30, 36, 0.4);
+  --text-main: #ffffff;
+  --text-muted: #888890;
+  --accent-cyan: #00f2fe;
+  --accent-blue: #4facfe;
+  --accent-white: #e8e8ea;
+  --border-light: rgba(255, 255, 255, 0.08);
+  
+  --grad-1: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
+  --grad-2: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+  --grad-3: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  color: var(--text-main);
+  background: url('/images/fitness_3d_reflection_bg.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.ambient-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 10, 12, 0.4);
+  backdrop-filter: blur(5px);
+  z-index: -1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>About Fitness System</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Outfit', sans-serif; 
+            background: #0f0f11; 
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(0, 242, 254, 0.15), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.15), transparent 40%);
+        }
+        .container { 
+            text-align: center; 
+            background: rgba(26, 26, 31, 0.65); 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 50px 60px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+            max-width: 650px;
+        }
+        h1 { 
+            font-size: 2.8rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            background: linear-gradient(to right, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        p { 
+            font-size: 1.15rem; 
+            color: #888890;
+            margin: 0 auto 20px; 
+            line-height: 1.8; 
+        }
+        .highlight {
+            color: #e8e8ea;
+            font-weight: 600;
+        }
+        a.btn { 
+            display: inline-block; 
+            margin-top: 30px;
+            padding: 14px 35px; 
+            background: linear-gradient(to right, #00f2fe, #4facfe); 
+            color: #000; 
+            border: none;
+            text-decoration: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        a.btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FITNESS</h1>
+        <p>At <span class="highlight">FITNESS</span>, we believe that health is your greatest wealth. Our platform is more than just a tracker; it's your personal companion in the journey towards a stronger, more vibrant version of yourself.</p>
+        
+        <p>Regular physical activity is the cornerstone of a healthy life. It boosts your energy, improves mental clarity, and strengthens your body against the challenges of daily life. Our mission is to provide you with the tools and insights you need to stay consistent and motivated every single day.</p>
+        
+        <p>No two bodies are the same. That's why we provide tailored tracking that adapts to your progress. Whether you are lifting weights, running, or practicing yoga, we help you focus on the metrics that matter most to your specific goals.</p>
+        
+        <p><span class="highlight">"Your only limit is you. Start tracking your progress today and watch yourself evolve into the best version of YOU."</span></p>
+        
+        <a href="/" class="btn">&larr; Return to Dashboard</a>
+    </div>
+</body>
+</html>

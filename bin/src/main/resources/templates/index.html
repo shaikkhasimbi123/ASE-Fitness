@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fitness Tracker - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background: url('/images/fitness_3d_reflection_bg.png') no-repeat center center fixed;
+            background-size: cover; color: #fff; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 1000px;
+        }
+        .ambient-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: -1; }
+        .container {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 40px; width: 100%; max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 0.8s ease-out;
+            
+            /* 3D Reflection Effect */
+            -webkit-box-reflect: below 2px linear-gradient(transparent, rgba(255,255,255,0.1));
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { text-align: center; margin-bottom: 40px; background: linear-gradient(to right, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05); color: #fff; font-size: 1rem; box-sizing: border-box;
+        }
+        .btn {
+            width: 100%; padding: 15px; border: none; border-radius: 10px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+            margin-top: 20px;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,242,254,0.4); }
+        .nav-links { text-align: center; margin-top: 25px; }
+        .nav-links a { color: #00f2fe; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="ambient-overlay"></div>
+    <header style="width: 100%; padding: 20px; text-align: center; background: rgba(0,0,0,0.5); position: absolute; top: 0; left: 0; z-index: 1000; backdrop-filter: blur(10px);">
+        <a href="/about" style="color: #00f2fe; margin: 0 20px; text-decoration: none; font-weight: bold;">About Us</a>
+        <a href="/contact" style="color: #00f2fe; margin: 0 20px; text-decoration: none; font-weight: bold;">Contact</a>
+        <a href="/register" style="color: #00f2fe; margin: 0 20px; text-decoration: none; font-weight: bold;">Register</a>
+        <a href="/admin" style="color: #00f2fe; margin: 0 20px; text-decoration: none; font-weight: bold;"><i class="fas fa-lock"></i> Admin</a>
+    </header>
+    <div class="container">
+        <h1>REKHA'S FITNESS</h1>
+        <div th:if="${loginError}" style="color: #ff6b6b; margin-bottom: 15px; font-weight: bold; text-align: center;">
+            <span th:text="${loginError}"></span>
+        </div>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="nav-links">
+            New user? <a href="/register">Create a profile</a>
+        </div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            const middleX = window.innerWidth / 2;
+            const middleY = window.innerHeight / 2;
+            
+            const offsetX = ((x - middleX) / middleX) * 15; // Max 15 degree tilt
+            const offsetY = ((y - middleY) / middleY) * 15;
+            
+            container.style.transform = `rotateX(${-offsetY}deg) rotateY(${offsetX}deg)`;
+        });
+
+        // Reset on mouse leave
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    </script>
+</body>
+</html>

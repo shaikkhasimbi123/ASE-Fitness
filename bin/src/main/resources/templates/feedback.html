@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Feedback</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; color: white; 
+            background: url('/images/fitness_3d_reflection_bg.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+            perspective: 1000px;
+        }
+        .container { 
+            text-align: center; background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); 
+            padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            width: 100%; max-width: 500px; z-index: 1;
+            
+            /* 3D Reflection Effect */
+            -webkit-box-reflect: below 2px linear-gradient(transparent, rgba(255,255,255,0.1));
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+        h1 { color: #00f2fe; }
+        textarea { width: 100%; height: 100px; border-radius: 8px; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); }
+        button, a.btn { display: inline-block; padding: 10px 20px; background: #4facfe; color: white; border: none; text-decoration: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Feedback</h1>
+        <div th:if="${successMsg}" style="color: #4ade80; margin-bottom: 15px; font-weight: bold;">
+            <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${errorMsg}" style="color: #ff6b6b; margin-bottom: 15px; font-weight: bold;">
+            <span th:text="${errorMsg}"></span>
+        </div>
+
+        <form th:action="@{/submit-feedback}" method="post">
+            <div style="margin-bottom: 15px;">
+                <input type="text" name="userName" required placeholder="Your Name" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <input type="email" name="userEmail" required placeholder="Your Email" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); box-sizing: border-box;">
+            </div>
+            <textarea name="userFeedback" required placeholder="Tell us what you think!" style="width: 100%; box-sizing: border-box;"></textarea><br>
+            <button type="submit" style="width: 100%; margin-bottom: 10px;">Submit Feedback</button>
+            <div style="margin-top: 10px;">
+                <a href="/" class="btn" style="background: transparent; border: 1px solid white; width: 100%; box-sizing: border-box;">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX; const y = e.clientY;
+            const middleX = window.innerWidth / 2; const middleY = window.innerHeight / 2;
+            const offsetX = ((x - middleX) / middleX) * 15;
+            const offsetY = ((y - middleY) / middleY) * 15;
+            container.style.transform = `rotateX(${-offsetY}deg) rotateY(${offsetX}deg)`;
+        });
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    </script>
+</body>
+</html>

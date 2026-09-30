@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Diet Plan | FITNESS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #02040a;
+            --card-base: rgba(10, 15, 25, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+        }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Outfit', sans-serif; color: var(--text-main);
+            background-color: var(--bg-base); background-size: cover; background-position: center;
+            background-attachment: fixed; min-height: 100vh; display: flex;
+        }
+
+        .ambient-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 280px; background: rgba(10, 15, 25, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; z-index: 10; }
+        .brand { font-size: 1.5rem; font-weight: 800; background: linear-gradient(to right, var(--accent-cyan), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 50px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--text-muted); text-decoration: none; border-radius: 12px; transition: 0.3s; margin-bottom: 5px; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .nav-item.active { background: linear-gradient(to right, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1)); border: 1px solid rgba(0, 242, 254, 0.2); color: var(--accent-cyan); }
+        .nav-item svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; height: 100vh; box-sizing: border-box; position: relative; z-index: 1; }
+        .glass-panel { background: var(--card-base); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .tagline { color: var(--text-muted); margin-bottom: 40px; }
+
+        .diet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .diet-card { padding: 30px !important; transition: 0.4s; }
+        .diet-card:hover { transform: translateY(-5px); border-color: var(--accent-cyan); }
+
+        .diet-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+        .diet-header h3 { margin: 0; color: var(--accent-cyan); letter-spacing: 1px; }
+        .meal-content { font-size: 0.95rem; color: #e8e8ea; line-height: 1.8; white-space: pre-line; }
+
+        .empty-state { text-align: center; padding: 60px !important; color: var(--text-muted); }
+        .empty-state span { font-size: 3rem; display: block; margin-bottom: 20px; opacity: 0.3; }
+
+        .sidebar-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border); }
+        .btn-logout { display: flex; align-items: center; gap: 10px; color: #ff4b2b; text-decoration: none; font-weight: 600; padding: 10px 20px; }
+    </style>
+</head>
+<body th:style="'background-image: url(/images/bluish_black_gym.png);'">
+    <div class="ambient-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="brand">FITNESS</div>
+        <nav>
+            <a th:href="@{/dashboard/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Dashboard
+            </a>
+            <a th:href="@{/myWorkouts/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+                My Workouts
+            </a>
+            <a th:href="@{/goalTarget/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16L16 12 12 8M8 12h8"/></svg>
+                Goals Target
+            </a>
+            <a th:href="@{/dietPlan/} + ${user.id}" class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M11 20.55V2l-2 2v10.55c-1.72.46-3 2-3 3.84 0 2.41 2.04 4.35 4.5 4.35 2.46 0 4.5-1.94 4.5-4.35 0-1.84-1.28-3.38-3-3.84zM18 20.85c2.83 0 5-2.17 5-5s-2.17-5-5-5-5 2.17-5 5 2.17 5 5 5z"/></svg>
+                Diet Plan
+            </a>
+            <a href="/feedback" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                Feedback
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="/" class="btn-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h1>Nutritional Vault</h1>
+        <p class="tagline">Your personalized roadmap to peak performance, <span th:text="${user.name}"></span>.</p>
+
+        <div th:if="${#lists.isEmpty(diets)}" class="glass-panel empty-state">
+            <span>🥗</span>
+            <h3>No diet plans synced.</h3>
+            <p>Generate your custom nutritional strategy in the React application to see it here.</p>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(diets)}" class="diet-grid">
+            <div th:each="diet : ${diets}" class="glass-panel diet-card">
+                <div class="diet-header">
+                    <span style="font-size: 1.5rem;">🥑</span>
+                    <h3 th:text="${diet.mealType}"></h3>
+                </div>
+                <div class="meal-content" th:text="${diet.foodItems}"></div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">[[${diet.calories}]] kcal / day</div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

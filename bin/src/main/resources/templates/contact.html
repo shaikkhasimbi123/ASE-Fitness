@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Contact</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background: url('/images/fitness_3d_reflection_bg.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            perspective: 1000px;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            
+            /* 3D Reflection Effect */
+            -webkit-box-reflect: below 2px linear-gradient(transparent, rgba(255,255,255,0.1));
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        h1 {
+            color: #00f2fe;
+        }
+
+        p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        a.btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4facfe;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>Email: rekhasfitness123@gmail.com<br>Address: Vijayawada</p>
+        <a href="/" class="btn">Back to Home</a>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX; const y = e.clientY;
+            const middleX = window.innerWidth / 2; const middleY = window.innerHeight / 2;
+            const offsetX = ((x - middleX) / middleX) * 15;
+            const offsetY = ((y - middleY) / middleY) * 15;
+            container.style.transform = `rotateX(${-offsetY}deg) rotateY(${offsetX}deg)`;
+        });
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    </script>
+</body>
+
+</html>

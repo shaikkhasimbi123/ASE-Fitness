@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fitness Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f0f11;
+            --card-base: rgba(26, 26, 31, 0.65);
+            --card-glass: rgba(30, 30, 36, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #888890;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-white: #e8e8ea;
+            --border-light: rgba(255, 255, 255, 0.08);
+            
+            --grad-1: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
+            --grad-2: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            --grad-3: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-base);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .ambient-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: -1;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(15, 15, 17, 0.8);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(to right, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-muted);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+            border-right: 4px solid var(--accent-cyan);
+        }
+
+        .nav-item svg {
+            width: 20px; height: 20px;
+            fill: none; stroke: currentColor; stroke-width: 2;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 0 30px;
+        }
+        
+        /* --- MAIN LAYOUT --- */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .greeting {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .greeting span {
+            color: var(--accent-cyan);
+        }
+
+        /* --- GRID SYSTEM --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+        }
+
+        .glass-panel {
+            background: var(--card-base);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            
+            /* 3D Interactive Preparation */
+            transition: transform 0.2s ease-out, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .glass-panel:hover {
+            box-shadow: 0 20px 40px rgba(0,242,254,0.2);
+            z-index: 100;
+        }
+
+        /* Stats Row */
+        .stat-card {
+            grid-column: span 3;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        
+        .stat-icon {
+            width: 60px; height: 60px;
+            border-radius: 16px;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--accent-cyan);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .stat-icon svg { width: 28px; height: 28px; }
+        
+        .stat-info h3 { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;}
+        .stat-info .value { font-size: 1.8rem; font-weight: 700; margin-top: 5px; }
+
+        /* Chart Section */
+        .chart-section {
+            grid-column: span 8;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .chart-header h2 { margin: 0; font-size: 1.3rem; }
+        
+        .bars-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            flex: 1;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+        .bar-wrap { width: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .bar {
+            width: 100%; background: rgba(255,255,255,0.1);
+            border-radius: 8px; transition: height 0.5s, background 0.3s;
+        }
+        .bar:hover { background: var(--accent-blue); }
+        .bar.active { background: var(--accent-cyan); box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+        .day-lbl { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        /* Profile Block */
+        .profile-block {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .avatar {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-blue);
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .p-metrics {
+            display: flex; justify-content: space-between; width: 100%;
+            margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-light);
+        }
+        .p-metric { display: flex; flex-direction: column; }
+        .p-metric .val { font-size: 1.4rem; font-weight: 700; }
+        .p-metric .lbl { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Workouts Section */
+        .workouts-section {
+            grid-column: span 12;
+            margin-top: 20px;
+        }
+        .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .workout-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .img-card {
+            height: 220px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .img-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,242,254,0.3); }
+        
+        .img-card.w1 { background: url('/images/strength_workout.png') center/cover; }
+        .img-card.w2 { background: url('/images/full_body_workout.png') center/cover; }
+        .img-card.w3 { background: url('/images/hiit_burn_workout.png') center/cover; }
+        
+        .img-card::after {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+        }
+
+        .card-info {
+            position: absolute; bottom: 20px; left: 20px; right: 20px;
+            z-index: 2;
+        }
+        .card-info h3 { margin: 0 0 5px 0; font-size: 1.5rem; color: #fff; }
+        .card-info p { margin: 0; color: rgba(255,255,255,0.8); font-size: 0.9rem; font-weight: 500;}
+        .card-tag {
+            position: absolute; top: 15px; left: 15px; z-index: 2;
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+            padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+        }
+
+        /* Forms & Lists Row */
+        .bottom-row { grid-column: span 12; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px; margin-top: 20px; }
+        
+        .form-area h2 { font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none; border-color: var(--accent-cyan);
+        }
+        .input-group select option {
+            color: #000;
+            background: #fff;
+        }
+        .btn-act {
+            width: 100%; padding: 14px; background: linear-gradient(to right, #00f2fe, #4facfe);
+            color: #000; font-weight: 700; border: none; border-radius: 12px; font-size: 1rem;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-act:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+
+        .list-wrap { max-height: 350px; overflow-y: auto; padding-right: 10px; }
+        .list-wrap::-webkit-scrollbar { width: 6px; }
+        .list-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+
+        .item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 10px;
+            border-left: 3px solid var(--accent-cyan);
+        }
+        .item-info h4 { margin: 0 0 5px 0; font-size: 1rem; }
+        .item-info p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .item-meta { text-align: right; }
+        .item-meta .hi { color: var(--accent-cyan); font-weight: 700; }
+        .item-meta .lo { font-size: 0.8rem; color: var(--text-muted); }
+
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;}
+        .badge.achieved { background: rgba(0, 242, 254, 0.2); color: #00f2fe; }
+        .badge.pending { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+
+        /* Photo Update Overlay */
+        .photo-update-box {
+            margin-top: 15px;
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .show-photo-box { display: flex !important; animation: fadeIn 0.3s; }
+        .edit-photo-btn {
+            background: none; border: none; color: var(--accent-cyan); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 10px; font-weight: 600;
+        }
+
+        /* Realtime Additions */
+        .toast-notification {
+            position: fixed; top: 30px; left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 242, 254, 0.15); backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-cyan); color: #fff;
+            padding: 12px 25px; border-radius: 30px; font-weight: 600;
+            z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideDownToast 4.5s ease-in-out forwards;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        @keyframes slideDownToast {
+            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            10% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            90% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+        }
+
+        .live-dot {
+            width: 8px; height: 8px; background: #00f2fe; border-radius: 50%;
+            display: inline-block; box-shadow: 0 0 10px #00f2fe;
+        }
+        .nav-container {
+            position: fixed; top: 20px; right: 20px; z-index: 2000;
+            display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
+        }
+        .nav-button {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 25px;
+            border-radius: 30px; color: #fff; text-decoration: none;
+            font-weight: 600; font-size: 0.85rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); letter-spacing: 0.5px;
+        }
+        .nav-button:hover {
+            background: #00f2fe; color: #000; transform: translateX(-10px);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); border-color: #00f2fe;
+        }
+    </style>
+</head>
+<body th:style="'background-image: url(/images/bg_' + ${bgCategory} + '.png);'">
+    
+    <div class="ambient-overlay"></div>
+    
+    <div class="toast-notification">
+        <span class="live-dot"></span>
+        <span>Secure connection active. Synced data for <span th:text="${user.name}"></span>.</span>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">FITNESS</div>
+        
+        <nav>
+            <a href="#" class="nav-item active">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Dashboard
+            </a>
+            <a th:href="@{/myWorkouts/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+                My Workouts
+            </a>
+            <a th:href="@{/goalTarget/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16L16 12 12 8M8 12h8"/></svg>
+                Goals Target
+            </a>
+            <a th:href="@{/dietPlan/} + ${user.id}" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M11 20.55V2l-2 2v10.55c-1.72.46-3 2-3 3.84 0 2.41 2.04 4.35 4.5 4.35 2.46 0 4.5-1.94 4.5-4.35 0-1.84-1.28-3.38-3-3.84zM18 20.85c2.83 0 5-2.17 5-5s-2.17-5-5-5-5 2.17-5 5 2.17 5 5 5z"/></svg>
+                Diet Plan
+            </a>
+            <a href="/feedback" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                Feedback
+            </a>
+            <a href="/about" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01M12 12l0 0"/></svg>
+                About Us
+            </a>
+            <a href="/contact" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                Contact
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="/" class="btn-act" style="display:block; text-align:center; text-decoration:none;"><svg viewBox="0 0 24 24" style="width:18px; margin-right:5px; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:2;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Switch User</a>
+        </div>
+    </aside>
+
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="main-content">
+        <header>
+            <h1 class="greeting">Welcome back, <span th:text="${user.name}"></span>!</h1>
+            
+            <div style="display:flex; align-items:center; gap: 20px;">
+                <div style="background:rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; font-weight: 500; display:flex; align-items:center; gap:10px;">
+                    <span class="live-dot" style="width:8px; height:8px;"></span>
+                    <span id="liveClock" style="font-family: monospace; font-weight: bold; color: var(--accent-cyan);">00:00:00</span>
+                    <span style="color: var(--text-muted); opacity: 0.5;">|</span>
+                    <span th:text="${#dates.format(#dates.createNow(), 'MMM dd')}">Date</span>
+                </div>
+                <img th:src="${user.profilePhotoUrl != null and user.profilePhotoUrl != ''} ? ${user.profilePhotoUrl} : 'https://ui-avatars.com/api/?name=' + ${user.name} + '&background=00f2fe&color=fff&size=150'" style="width:50px; height:50px; border-radius:50%; border:2px solid var(--accent-blue); object-fit: cover;">
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <!-- STAT SUMMARY CARDS -->
+            <div class="glass-panel stat-card">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17.5 19c2.5 0 4.5-2 4.5-4.5S17.5 10 17.5 10 13 12.5 13 15s2 4.5 4.5 4.5zM6.5 19C9 19 11 17 11 14.5S6.5 10 6.5 10 2 12.5 2 15s2 4.5 4.5 4.5zM12 11c2 0 3.5-1.5 3.5-3.5S12 2 12 2 8.5 5.5 8.5 7.5 10 11 12 11z"/></svg></div>
+                <div class="stat-info">
+                    <h3>Total Calories Burned</h3>
+                    <div class="value" id="caloriesStat" th:text="${totalCalories}">0</div>
+                </div>
+            </div>
+
+            <div class="glass-panel stat-card">
+                <div class="stat-icon" style="color:#55efc4; background:rgba(85, 239, 196, 0.1);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                <div class="stat-info">
+                    <h3>Total Active Time</h3>
+                    <div class="value" id="timeStat">
+                        <span th:text="${totalDuration}">0</span>
+                        <span style="font-size:0.9rem; font-weight:400; color:#aaa;">min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 2: PROFILE (Moved up to fill space) -->
+            <div class="glass-panel profile-block" style="grid-column: span 6;">
+                <div style="width:100%; text-align:right;">
+                    <a href="/about" style="color:var(--text-muted);"><svg viewBox="0 0 24 24" style="width:20px; fill:none; stroke:currentColor; stroke-width:2;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></a>
+                </div>
+                <img th:src="${user.profilePhotoUrl != null and user.profilePhotoUrl != ''} ? ${user.profilePhotoUrl} : 'https://ui-avatars.com/api/?name=' + ${user.name} + '&background=00f2fe&color=fff&size=150'" class="avatar" style="object-fit: cover;">
+                <h2 style="margin:0 0 5px 0;" th:text="${user.name}">User Name</h2>
+                <p style="margin:0; color:var(--accent-cyan); font-size:0.85rem; font-weight:600; letter-spacing:0.5px;" th:text="'@' + ${user.username}">@username</p>
+                <p style="margin:5px 0 0 0; color:var(--text-muted); font-size:0.9rem;"><span class="live-dot" style="width:6px; height:6px; vertical-align:middle; margin-right:4px;"></span> Pro Member</p>
+                
+                <div class="p-metrics">
+                    <div class="p-metric">
+                        <span class="val" th:text="${user.age}"></span>
+                        <span class="lbl">Years</span>
+                    </div>
+                    <div class="p-metric">
+                        <span class="val" th:text="${user.weight}"></span>
+                        <span class="lbl">Kg</span>
+                    </div>
+                    <div class="p-metric">
+                        <span class="val" th:text="${user.height}"></span>
+                        <span class="lbl">cm</span>
+                    </div>
+                </div>
+
+                <button class="edit-photo-btn" onclick="document.getElementById('photoBox').classList.toggle('show-photo-box')">Update Avatar</button>
+                <div class="photo-update-box" id="photoBox">
+                    <form th:action="@{/updatePhoto/} + ${user.id}" method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:8px;">
+                        <input type="file" name="image" accept="image/png, image/jpeg" required style="width:100%; padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; box-sizing:border-box; font-size:0.85rem;">
+                        <button type="submit" class="btn-act" style="padding:8px; font-size:0.85rem;">Upload Avatar</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ROW 3: TRENDING WORKOUTS -->
+            <div class="workouts-section">
+                <div class="section-title">
+                    <span>Trending Masterclasses</span>
+                    <a href="javascript:void(0)" onclick="toggleLibrary()" style="font-size:0.9rem; color:var(--accent-cyan); text-decoration:none;">View Library &rarr;</a>
+                </div>
+                
+                <div class="workout-cards-grid">
+                    <div class="img-card w1" onclick="presetWorkout('Strength', 30, 345)">
+                        <span class="card-tag">Strength</span>
+                        <div class="card-info">
+                            <h3>Dumbbell Power</h3>
+                            <p>🔥 345 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 30 min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="img-card w2" onclick="presetWorkout('Full Body', 42, 289)">
+                        <span class="card-tag">Full Body</span>
+                        <div class="card-info">
+                            <h3>Complete Tone</h3>
+                            <p>🔥 289 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 42 min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="img-card w3" onclick="presetWorkout('HIIT Burn', 56, 427)">
+                        <span class="card-tag">Cardio</span>
+                        <div class="card-info">
+                            <h3>High Intensity Burn</h3>
+                            <p>🔥 427 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 56 min</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extended Library (Hidden by default) -->
+                <div class="workout-cards-grid" id="extendedLibrary" style="display:none; margin-top:25px; opacity:0; transition: opacity 0.4s ease;">
+                    <div class="img-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);" onclick="presetWorkout('Yoga', 45, 180)">
+                        <span class="card-tag" style="color:#000;">Recovery</span>
+                        <div class="card-info">
+                            <h3>Zen Flow Yoga</h3>
+                            <p>🔥 180 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 45 min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="img-card" style="background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);" onclick="presetWorkout('Cycling', 60, 520)">
+                        <span class="card-tag" style="color:#000;">Endurance</span>
+                        <div class="card-info">
+                            <h3 style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Mountain Climb</h3>
+                            <p>🔥 520 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 60 min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="img-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);" onclick="presetWorkout('Running', 25, 300)">
+                        <span class="card-tag" style="color:#000;">Speed</span>
+                        <div class="card-info">
+                            <h3 style="color:#222;">5K Sprint Challenge</h3>
+                            <p style="color:#444;">🔥 300 Kcal &nbsp;&nbsp;|&nbsp;&nbsp; ⏱ 25 min</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 4: DATA PANELS (Log Workout, Activity, Goals) -->
+            <div class="bottom-row">
+                <!-- Log Form -->
+                <div class="glass-panel form-area" id="logForm">
+                    <h2>Log New Workout</h2>
+                    <form id="workoutForm" th:action="@{/addWorkout/} + ${user.id}" method="post">
+                        <div class="input-group">
+                            <label>Workout Type</label>
+                            <select name="type" id="workoutTypeAuto" required>
+                                <option value="Strength">Strength</option>
+                                <option value="Full Body">Full Body</option>
+                                <option value="HIIT Burn">HIIT Burn</option>
+                                <option value="Running">Running</option>
+                                <option value="Cycling">Cycling</option>
+                                <option value="Yoga">Yoga</option>
+                                <option value="Swimming">Swimming</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Duration (Minutes)</label>
+                            <input type="number" name="durationMinutes" required min="1">
+                        </div>
+                        <div class="input-group">
+                            <label>Calories Burned</label>
+                            <input type="number" name="caloriesBurned" required min="1">
+                        </div>
+                        <button type="submit" class="btn-act">Add Record</button>
+                    </form>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="glass-panel" id="recentWorkouts">
+                    <h2 style="font-size: 1.2rem; margin-top: 0; margin-bottom: 20px;">Recent Activity</h2>
+                    <div class="list-wrap" id="workoutsListWrap">
+                        <div th:if="${#lists.isEmpty(workouts)}">
+                            <p style="color:var(--text-muted);">No workouts logged yet. Start training!</p>
+                        </div>
+                        <div th:each="workout : ${workouts}" class="item-row">
+                            <div class="item-info">
+                                <h4 th:text="${workout.type}"></h4>
+                                <p th:text="${workout.workoutDate}"></p>
+                            </div>
+                            <div class="item-meta">
+                                <div class="hi" th:text="'+' + ${workout.caloriesBurned} + ' kcal'"></div>
+                                <div class="lo" th:text="${workout.durationMinutes} + ' min'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals Area -->
+                <div class="glass-panel" id="goalsBlock" style="display:flex; flex-direction:column;">
+                    <h2 style="font-size: 1.2rem; margin-top: 0; margin-bottom: 20px;">Fitness Goals</h2>
+                    
+                    <div class="list-wrap" id="goalsListWrap" style="flex:1; margin-bottom: 15px;">
+                         <div th:if="${#lists.isEmpty(goals)}" style="color:var(--text-muted); margin-bottom:20px;">
+                            No active goals. Set one below.
+                        </div>
+                        <div th:each="goal : ${goals}" class="item-row" style="border-left-color: #fbc2eb;">
+                            <div class="item-info">
+                                <h4 th:text="${goal.description}"></h4>
+                                <p>Target: <span th:text="${goal.targetDate}"></span></p>
+                            </div>
+                            <div>
+                                <span class="badge achieved" th:if="${goal.achieved}">Done</span>
+                                <span class="badge pending" th:unless="${goal.achieved}">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Goal Form -->
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius:12px; margin-top:auto;">
+                        <h3 style="margin:0 0 10px 0; font-size:0.9rem; color:var(--text-muted);">Set Target</h3>
+                        <form id="goalForm" th:action="@{/addGoal/} + ${user.id}" method="post" style="display:flex; flex-direction:column; gap:10px;">
+                            <input type="text" name="description" required placeholder="Description (e.g. Run 10k)" style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; box-sizing:border-box;">
+                            <input type="date" name="targetDate" required style="width:100%; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; box-sizing:border-box;">
+                            <button type="submit" class="btn-act" style="padding:10px; font-size:0.9rem;">Create Goal</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div> <!-- end bottom-row -->
+
+            <!-- AI PROTOCOL ENGINE -->
+            <div class="glass-panel" style="grid-column: span 12; margin-top: 15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.4rem; margin: 0; background: linear-gradient(to right, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI Nutrition & Recovery Protocol</h2>
+                </div>
+                
+                <div style="display: flex; flex-direction:column; gap: 10px;">
+                    <label style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Select Your Primary Objective to Generate Menu</label>
+                    <select id="goalSelector" onchange="generateAIPlan()" style="max-width:400px; padding: 12px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius:12px; color:#fff; font-family:inherit; outline:none;">
+                        <option value="" disabled selected style="color:#000;">Select objective...</option>
+                        <option value="weight_loss" style="color:#000;">Fat Loss & Defining</option>
+                        <option value="muscle_gain" style="color:#000;">Hypertrophy (Muscle Gain)</option>
+                        <option value="endurance" style="color:#000;">Athletic Endurance</option>
+                        <option value="longevity" style="color:#000;">Health & Longevity</option>
+                    </select>
+                </div>
+                
+                <div id="aiPlanOutput" style="display:none; margin-top: 25px; grid-template-columns: 1fr 1fr; gap: 25px; animation: fadeIn 0.5s;">
+                    <!-- Nutrition -->
+                    <div style="background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.2); padding: 25px; border-radius: 20px; box-shadow: inset 0 0 20px rgba(0,242,254,0.02);">
+                        <h3 style="margin-top:0; color: #00f2fe; display:flex; align-items:center; gap:8px; font-size:1.2rem;">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                            Food Planning Menu
+                        </h3>
+                        <ul id="foodMenu" style="padding-left: 20px; color: #e8e8ea; line-height: 1.8; margin-bottom:0; font-size:0.95rem;">
+                        </ul>
+                    </div>
+                    
+                    <!-- Sleep -->
+                    <div style="background: rgba(251,194,235,0.05); border: 1px solid rgba(251,194,235,0.2); padding: 25px; border-radius: 20px; box-shadow: inset 0 0 20px rgba(251,194,235,0.02);">
+                        <h3 style="margin-top:0; color: #fbc2eb; display:flex; align-items:center; gap:8px; font-size:1.2rem;">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                            Sleeping Menu
+                        </h3>
+                        <ul id="sleepMenu" style="padding-left: 20px; color: #e8e8ea; line-height: 1.8; margin-bottom:0; font-size:0.95rem;">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end dashboard-grid -->
+
+        <!-- SAVED DIET PLANS -->
+        <div id="dietSection" class="glass-panel" style="margin-top: 25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+                <h2 style="font-size: 1.4rem; margin: 0; color: var(--accent-cyan);">Saved Nutritional Strategies</h2>
+                <div style="background: rgba(0, 242, 254, 0.1); color: var(--accent-cyan); padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; border: 1px solid var(--accent-cyan);">VAULT SYNCED</div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(diets)}" style="text-align:center; padding: 40px; color:var(--text-muted);">
+                <p>No permanent diet plans found in the database. Use our React generator to save a plan.</p>
+            </div>
+            
+            <div th:if="${not #lists.isEmpty(diets)}" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px;">
+                <div th:each="diet : ${diets}" class="glass-panel" style="padding: 25px; border-color: rgba(0,242,254,0.1); background: rgba(0,0,0,0.2); -webkit-box-reflect: none;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+                        <span style="font-size: 1.8rem; filter: drop-shadow(0 0 10px var(--accent-cyan));">🥗</span>
+                        <h3 th:text="${diet.mealType}" style="margin:0; font-size:1.2rem; color:var(--accent-cyan); letter-spacing: 1px;"></h3>
+                    </div>
+                    <div style="font-size:0.95rem; color:#e8e8ea; line-height:1.8; white-space: pre-line;" th:text="${diet.foodItems}"></div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">Target: [[${diet.calories}]] kcal</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        // Smooth scrolling for anchor links to prevent sudden jumps
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if(targetId === "#") return;
+                
+                const targetEl = document.querySelector(targetId);
+                if(targetEl) {
+                    e.preventDefault();
+                    targetEl.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // Add active class to nav
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Setup Real-time AJAX form submissions
+        function handleRealtimeForm(formId, listWrapId, updateStats) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = form.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Saving... <span class="live-dot" style="margin-left:5px;"></span>';
+                btn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Extract the updated blocks from the server's HTML response
+                    const parser = new DOMParser();
+                    const newDoc = parser.parseFromString(html, 'text/html');
+                    
+                    // Repaint the list wrap securely without a full page reload
+                    document.getElementById(listWrapId).innerHTML = newDoc.getElementById(listWrapId).innerHTML;
+
+                    // If it's the workout form, incrementally update the analytical stat blocks
+                    if (updateStats) {
+                        document.getElementById('caloriesStat').innerHTML = newDoc.getElementById('caloriesStat').innerHTML;
+                        document.getElementById('timeStat').innerHTML = newDoc.getElementById('timeStat').innerHTML;
+                    }
+
+                    form.reset();
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+
+                    showToast('Successfully synced to cloud!');
+                })
+                .catch(err => {
+                    console.error(err);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showToast('Error syncing data.');
+                });
+            });
+        }
+
+        // Attach listeners securely to both isolated forms
+        handleRealtimeForm('workoutForm', 'workoutsListWrap', true);
+        handleRealtimeForm('goalForm', 'goalsListWrap', false);
+
+        // AI Nutrition and Sleep Engine
+        const aiProtocols = {
+            weight_loss: {
+                food: [
+                    "Breakfast: Egg white omelette with spinach & black coffee (0 Caloric sweetener).",
+                    "Lunch: Grilled chicken breast (150g) with 1/2 cup quinoa and steamed broccoli.",
+                    "Snack: Plain Greek yogurt with a handful of crushed almonds.",
+                    "Dinner: Baked wild salmon with mixed greens and balsamic vinaigrette.",
+                    "Hydration: Minimum 3 liters of water per day to assist metabolism."
+                ],
+                sleep: [
+                    "Schedule: Target 10:30 PM to 6:00 AM (7.5 hours minimum).",
+                    "Environment: Drop room temperature to 65°F (18°C) to promote deep sleep.",
+                    "Routine: Digital sundown 45 minutes before bed to lower cortisol spikes.",
+                    "Mechanism: Fat oxidation occurs heavily during REM sleep; do not cut hours short."
+                ]
+            },
+            muscle_gain: {
+                food: [
+                    "Breakfast: 3 whole eggs, oatmeal with peanut butter, and a protein shake.",
+                    "Lunch: Ground beef/turkey (200g) with 1 full cup of white rice and mixed vegetables.",
+                    "Pre-Workout: 1 banana and a black coffee 45 mins prior to lift.",
+                    "Dinner: Sirloin steak (200g) with sweet potato and asparagus.",
+                    "Protein Target: Aim for 1.8g to 2.2g of protein per kg of body weight daily."
+                ],
+                sleep: [
+                    "Schedule: Target 10:00 PM to 6:30 AM (8+ hours required for muscle synthesis).",
+                    "Supplementation: Consider Casein protein or Cottage Cheese 30 mins before bed.",
+                    "Environment: Pitch black room (use blackout curtains) to maximize HGH release.",
+                    "Routine: Foam roll or stretch tight muscles for 10 minutes prior to boarding bed."
+                ]
+            },
+            endurance: {
+                food: [
+                    "Breakfast: Large bowl of oatmeal with berries, chia seeds, and honey.",
+                    "Lunch: Whole wheat pasta with lean turkey meatballs and marinara sauce.",
+                    "Intra-Workout: Electrolyte matrix with fast-absorbing carbs (e.g. Dextrose).",
+                    "Dinner: Chicken breast with roasted potatoes and heavy greens.",
+                    "Carb Loading: High carbohydrate intake is required to maintain glycogen stores."
+                ],
+                sleep: [
+                    "Schedule: Target 9:30 PM to 6:00 AM. Consistency is key for CNS recovery.",
+                    "Recovery: Elevate legs for 15 minutes before sleep to reduce lactic pooling.",
+                    "Hydration: Consume electrolytes at least 1 hour before bed, avoid chugging water.",
+                    "Tech: Use tracking tools to ensure Heart Rate Variability (HRV) is recovering."
+                ]
+            },
+            longevity: {
+                food: [
+                    "Breakfast: Intermittent Fasting protocol (First meal at 11:00 AM). Black coffee/Tea.",
+                    "Lunch: Large Mediterranean salad with olive oil, olives, feta, and grilled fish.",
+                    "Snack: Handful of walnuts and mixed berries (high antioxidants).",
+                    "Dinner: Plant-based primary (Lentils, chickpeas) restricted to before 7:00 PM.",
+                    "Micronutrients: Focus heavily on Omega-3s, Vitamin D3, and fiber-dense foods."
+                ],
+                sleep: [
+                    "Schedule: Align strictly with the Circadian Rhythm (e.g., 10:00 PM - 5:30 AM).",
+                    "Mechanisms: Deep sleep flushes brain plaque; prioritize uninterrupted blocks.",
+                    "Routine: 10 minutes of meditation or breathwork (4-7-8 method) upon laying down.",
+                    "Lighting: strictly utilize red-shifted light bulbs or blue-light blockers after 8:00 PM."
+                ]
+            }
+        };
+
+        function generateAIPlan() {
+            const objective = document.getElementById('goalSelector').value;
+            if(!objective || !aiProtocols[objective]) return;
+            
+            const panel = document.getElementById('aiPlanOutput');
+            panel.style.display = 'grid';
+            
+            const foodUI = document.getElementById('foodMenu');
+            foodUI.innerHTML = '';
+            aiProtocols[objective].food.forEach(text => {
+                let li = document.createElement('li');
+                li.innerHTML = text.replace(/([A-Za-z-]+:)/, '<strong>$1</strong>');
+                foodUI.appendChild(li);
+            });
+
+            const sleepUI = document.getElementById('sleepMenu');
+            sleepUI.innerHTML = '';
+            aiProtocols[objective].sleep.forEach(text => {
+                let li = document.createElement('li');
+                li.innerHTML = text.replace(/([A-Za-z-]+:)/, '<strong>$1</strong>');
+                sleepUI.appendChild(li);
+            });
+            
+            // Scroll down cleanly 
+            panel.scrollIntoView({behavior: 'smooth', block: 'end'});
+            showToast('Customized Protocol Loaded.');
+        }
+
+        // Advanced preset auto-population engine
+        function presetWorkout(type, duration, calories) {
+            const form = document.getElementById('workoutForm');
+            form.querySelector('select[name="type"]').value = type;
+            form.querySelector('input[name="durationMinutes"]').value = duration;
+            form.querySelector('input[name="caloriesBurned"]').value = calories;
+            
+            document.getElementById('logForm').scrollIntoView({behavior:'smooth'});
+            showToast(`${type} parameters loaded. Ready to execute!`);
+        }
+
+        // Vault toggle engine
+        function toggleLibrary() {
+            const ext = document.getElementById('extendedLibrary');
+            if(ext.style.display === 'none') {
+                ext.style.display = 'grid';
+                setTimeout(() => { ext.style.opacity = '1'; }, 20);
+            } else {
+                ext.style.opacity = '0';
+                setTimeout(() => { ext.style.display = 'none'; }, 400);
+            }
+        }
+
+        // Toast notification resizer engine
+        function showToast(message) {
+            const toast = document.querySelector('.toast-notification');
+            toast.style.animation = 'none';
+            toast.offsetHeight; // trigger reflow
+            toast.querySelector('span:nth-child(2)').innerText = message;
+            toast.style.animation = 'slideDownToast 4.5s ease-in-out forwards';
+        }
+        // Real-time Clock Implementation
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                          now.getMinutes().toString().padStart(2, '0') + ':' + 
+                          now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('liveClock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Real-time Data Polling (Auto-sync every 10 seconds)
+        function pollUserData() {
+            const userId = [[${user.id}]];
+            fetch(`/api/stats/${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const calEl = document.getElementById('caloriesStat');
+                    const timeEl = document.querySelector('#timeStat span:first-child');
+                    
+                    // Animate value change if updated
+                    if (parseInt(calEl.innerText) !== data.totalCalories) {
+                        calEl.style.color = '#00f2fe';
+                        calEl.innerText = data.totalCalories;
+                        setTimeout(() => { calEl.style.color = ''; }, 2000);
+                    }
+                    if (parseInt(timeEl.innerText) !== data.totalDuration) {
+                        timeEl.style.color = '#55efc4';
+                        timeEl.innerText = data.totalDuration;
+                        setTimeout(() => { timeEl.style.color = ''; }, 2000);
+                    }
+                })
+                .catch(err => console.warn('Polling sync paused...', err));
+        }
+        setInterval(pollUserData, 10000);
+
+        // Dashboard Interactive 3D Tilt Engine
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mousemove', (e) => {
+                const rect = panel.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const middleX = rect.width / 2;
+                const middleY = rect.height / 2;
+                
+                const offsetX = ((x - middleX) / middleX) * 10; // 10 degree tilt
+                const offsetY = ((y - middleY) / middleY) * 10;
+                
+                panel.style.transform = `perspective(1000px) rotateX(${-offsetY}deg) rotateY(${offsetX}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            panel.addEventListener('mouseleave', () => {
+                panel.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>About Fitness System</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Outfit', sans-serif; 
+            background: #0f0f11; 
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(0, 242, 254, 0.15), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(79, 172, 254, 0.15), transparent 40%);
+        }
+        .container { 
+            text-align: center; 
+            background: rgba(26, 26, 31, 0.65); 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 50px 60px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+            max-width: 650px;
+        }
+        h1 { 
+            font-size: 2.8rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            background: linear-gradient(to right, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        p { 
+            font-size: 1.15rem; 
+            color: #888890;
+            margin: 0 auto 20px; 
+            line-height: 1.8; 
+        }
+        .highlight {
+            color: #e8e8ea;
+            font-weight: 600;
+        }
+        a.btn { 
+            display: inline-block; 
+            margin-top: 30px;
+            padding: 14px 35px; 
+            background: linear-gradient(to right, #00f2fe, #4facfe); 
+            color: #000; 
+            border: none;
+            text-decoration: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        a.btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rekha's Fitness System</h1>
+        <p>Welcome to <span class="highlight">Fitness AI</span>, a premium, modern health tracking platform designed to adapt dynamically to your lifestyle and background.</p>
+        
+        <p>Our core mission is to bring high-quality, personalized fitness insights to users across all walks of life. Whether you are a younger athlete looking for high-intensity burnouts, an active adult optimizing endurance, or a senior prioritizing mobility and longevity, our engine dynamically formats to your exact demographic.</p>
+        
+        <p>With immersive UI themes, cinematic 4K analytics, and live asynchronous synchronization, we guarantee that pushing your limits feels less like a chore and more like executing a technological masterpiece.</p>
+        
+        <p>Log your daily activities, set high-stakes goals, and actively crush them. <span class="highlight">Your evolution begins here.</span></p>
+        
+        <a href="/" class="btn">&larr; Return to Dashboard</a>
+    </div>
+</body>
+</html>
