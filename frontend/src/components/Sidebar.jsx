@@ -38,7 +38,7 @@ const Sidebar = () => {
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         fontSize: '1.5rem'
-      }}>FITNESS</h2>
+      }}>Ctrl+Alt+Elite Fitness</h2>
       
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {navItems.map((item) => (

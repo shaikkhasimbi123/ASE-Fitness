@@ -9,7 +9,7 @@ const About = () => {
       
       <div className="glass-panel about-container">
         <header className="about-header">
-          <h1>FITNESS</h1>
+          <h1>Ctrl+Alt+Elite Fitness</h1>
           <p className="subtitle">Empowering your evolution through data-driven fitness.</p>
         </header>
 
@@ -18,7 +18,7 @@ const About = () => {
           <section className="narrative-section">
             <div className="narrative-text">
               <h2>Our Philosophy</h2>
-              <p>At <span style={{ color: 'var(--accent-cyan)', fontWeight: 'bold' }}>FITNESS</span>, we believe that health is your greatest wealth. Our platform is more than just a tracker; it's your personal companion in the journey towards a stronger, more vibrant version of yourself.</p>
+              <p>At <span style={{ color: 'var(--accent-cyan)', fontWeight: 'bold' }}>Ctrl+Alt+Elite Fitness</span>, we believe that health is your greatest wealth. Our platform is more than just a tracker; it's your personal companion in the journey towards a stronger, more vibrant version of yourself.</p>
               <div className="accent-line"></div>
             </div>
             <div className="narrative-image">

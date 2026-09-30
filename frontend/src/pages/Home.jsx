@@ -34,7 +34,7 @@ const Home = () => {
       <section className="hero-section">
         <div className="hero-content glass-panel reveal">
           <h1 className="hero-title" style={{ transform: `translateY(${scrollY * 0.1}px)` }}>
-            FITNESS
+            Ctrl+Alt+Elite Fitness
           </h1>
           <p className="hero-tagline reveal">Unlock your potential with the next generation of fitness tracking.</p>
           
@@ -79,7 +79,7 @@ const Home = () => {
 
       {/* FEATURES SECTION */}
       <section className="features-section">
-        <h2 className="section-title reveal">Why Choose FITNESS?</h2>
+        <h2 className="section-title reveal">Why Choose Ctrl+Alt+Elite Fitness?</h2>
         <div className="features-grid">
           <div className="feature-card glass-panel reveal" style={{ transitionDelay: '0.1s' }}>
             <div className="feature-image food-img"></div>
@@ -123,7 +123,7 @@ const Home = () => {
         <div className="brand-card glass-panel reveal">
           <div className="brand-badge">THE LEGACY</div>
           <h2>Redefining Fitness for the Modern Age</h2>
-          <p>FITNESS was born from a simple vision: to bridge the gap between high-end professional coaching and daily lifestyle tracking. We don't just count steps; we empower journeys. Our platform combines aesthetic excellence with mathematical precision to help you rewrite your story.</p>
+          <p>Ctrl+Alt+Elite Fitness was born from a simple vision: to bridge the gap between high-end professional coaching and daily lifestyle tracking. We don't just count steps; we empower journeys. Our platform combines aesthetic excellence with mathematical precision to help you rewrite your story.</p>
           <div className="brand-values">
             <div className="value-item">
               <span className="v-icon">💎</span>
@@ -162,7 +162,7 @@ const Home = () => {
       <footer className="landing-footer reveal">
         <div className="footer-content">
           <div className="footer-brand">
-            <h3>FITNESS</h3>
+            <h3>Ctrl+Alt+Elite Fitness</h3>
             <p>Your ultimate fitness companion.</p>
           </div>
           <div className="footer-links">
@@ -173,7 +173,7 @@ const Home = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2026 FITNESS. All rights reserved.</p>
+          <p>&copy; 2026 Ctrl+Alt+Elite Fitness. All rights reserved.</p>
         </div>
       </footer>
 

@@ -358,7 +358,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2026 Fitness. All Rights Reserved. | Systems Optimal | Connected via Secure API</p>
+            <p>&copy; 2026 Ctrl+Alt+Elite Fitness. All Rights Reserved. | Systems Optimal | Connected via Secure API</p>
           </div>
         </footer>
       </main>

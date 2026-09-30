@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <>
     <div style={{ position: 'fixed', top: '25px', left: '30px', zIndex: 1000 }}>
-      <Link to="/" style={{ textDecoration: 'none', color: '#fff', fontWeight: '900', fontSize: '1.6rem', letterSpacing: '2px', textShadow: '0 0 20px rgba(0,242,254,0.5)' }}>FITNESS</Link>
+      <Link to="/" style={{ textDecoration: 'none', color: '#fff', fontWeight: '900', fontSize: '1.6rem', letterSpacing: '2px', textShadow: '0 0 20px rgba(0,242,254,0.5)' }}>Ctrl+Alt+Elite Fitness</Link>
     </div>
     <div className="nav-container" style={{ 
       position: 'fixed', 

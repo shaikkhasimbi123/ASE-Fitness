@@ -34,7 +34,7 @@ const Login = () => {
       <Navbar />
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
         <div className="glass-panel" style={{ width: '400px' }}>
-          <h1 style={{ textAlign: 'center', color: 'var(--accent-cyan)', fontSize: '2rem', marginBottom: '10px' }}>FITNESS</h1>
+          <h1 style={{ textAlign: 'center', color: 'var(--accent-cyan)', fontSize: '2rem', marginBottom: '10px' }}>Ctrl+Alt+Elite Fitness</h1>
           <h2 style={{ textAlign: 'center', color: '#fff', fontSize: '1.2rem', marginBottom: '30px' }}>Login</h2>
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '15px' }}>
