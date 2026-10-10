@@ -1,2 +1,5 @@
 {"logTime": "0815/150608", "session": "START"}
 {"logTime": "0815/150617", "session": "END"}
+{"logTime": "1009/173404", "session": "START"}
+{"logTime": "1009/173404", "level": "INFO", "location": "chrome\\browser\\sessions\\session_service_log.cc:326 EdgeLogSessionServiceMessage", "message": "SessionServiceEvent: kStart - {\r\n   \"crashed\": false,\r\n   \"type\": 0\r\n}\r\n"}
+{"logTime": "1009/173412", "session": "END"}
